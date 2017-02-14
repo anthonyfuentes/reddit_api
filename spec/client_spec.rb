@@ -37,6 +37,19 @@ describe RedditApi::Client do
         expect(client.username).to_not be_nil
       end
     end
+
+    describe "#get" do
+      it "uses external client to send get request" do
+        external_client = double()
+        response = { access_token: "" }
+        allow(external_client).to receive(:post).and_return(response)
+        client = RedditApi::Client.new(client: external_client)
+
+        expect(external_client).to receive(:get)
+
+        client.get("url", {})
+      end
+    end
   end
 
 end
