@@ -12,6 +12,16 @@ describe RedditApi::Comment do
     end
   end
 
+  describe "#subreddit_name" do
+    it "returns the name of the subreddit where the comment was made" do
+      subreddit_name = "AskReddit"
+      params = { "subreddit" => subreddit_name }
+      comment = RedditApi::Comment.new(params)
+
+      expect(comment.subreddit_name).to eq(subreddit_name)
+    end
+  end
+
   describe "#to_h" do
     it "returns a hash representation of the comment" do
       comment = RedditApi::Comment.new
