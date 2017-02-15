@@ -20,7 +20,7 @@ describe RedditApi::Posts do
 
       result = posts_api.top(subreddit, 5)
 
-      stickied = result.any? { |p| p["data"]["stickied"] }
+      stickied = result.any? { |p| p.stickied }
       expect(stickied).to be false
     end
   end
