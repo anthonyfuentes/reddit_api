@@ -15,9 +15,9 @@ module RedditApi
     attr_reader :client
 
     def top_data(count)
-      url = "https://oauth.reddit.com/subreddits/popular.json"
+      endpoint = "subreddits/popular.json"
       query = { limit: count }
-      response = client.get(url, query)
+      response = client.get(endpoint, query)
       response["data"]["children"]
     end
 

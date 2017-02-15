@@ -12,16 +12,19 @@ module RedditApi
       @password = ENV["REDDIT_AGENT"]
       @secret = ENV["REDDIT_AGENT"]
       @username = ENV["REDDIT_AGENT"]
+      @base_url = "https://oauth.reddit.com/"
     end
 
-    def get(url, query)
+    def get(endpoint, query)
+      sleep(1)
       headers = { "Authorization" => "bearer #{access_token}",
                   "user-agent" => agent }
+      url = base_url + endpoint
       client.get(url, headers: headers, query: query)
     end
 
     private
-    attr_reader :client
+    attr_reader :client, :base_url
 
     def access_token
       url = "https://www.reddit.com/api/v1/access_token"
