@@ -25,6 +25,17 @@ describe RedditApi::Comments do
       expect(comments.length).to eq(count)
     end
 
+    it "comments are unique" do
+      comments_api = RedditApi::Comments.new
+      user = RedditApi::User.new({ "username" => "spez" })
+      count = 5
+
+      comments = comments_api.most_recent_comments(user, count)
+      unique_comments = comments.uniq { |c| c.reddit_id }
+
+      expect(unique_comments.length == comments.length).to be true
+    end
+
     it "returns only comments for the given user" do
       comments_api = RedditApi::Comments.new
       user = RedditApi::User.new({ "username" => "spez" })
