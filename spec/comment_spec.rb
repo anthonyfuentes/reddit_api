@@ -2,6 +2,16 @@ require "spec_helper"
 
 describe RedditApi::Comment do
 
+  describe "#reddit_id" do
+    it "returns the comment's Reddit ID" do
+      reddit_id = "dcwe4m6"
+      params = { "id" => reddit_id }
+      comment = RedditApi::Comment.new(params)
+
+      expect(comment.reddit_id).to eq(reddit_id)
+    end
+  end
+
   describe "#author_name" do
     it "returns the name of comment's author" do
       author_name = "spez"
