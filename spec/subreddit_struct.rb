@@ -1,0 +1,2 @@
+
+Subreddit = Struct.new(:name)
