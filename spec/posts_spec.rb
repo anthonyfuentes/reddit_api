@@ -8,9 +8,21 @@ describe RedditApi::Posts do
       subreddit_params = { "display_name" => "AskReddit" }
       subreddit = RedditApi::Subreddit.new(subreddit_params)
 
-      result = posts_api.top(subreddit, 5)
+      posts = posts_api.top(subreddit, 5)
 
-      expect(result.length).to eq(5)
+      expect(posts.length).to eq(5)
+    end
+
+    it "posts are unique" do
+      posts_api = RedditApi::Posts.new
+      subreddit_params = { "display_name" => "AskReddit" }
+      subreddit = RedditApi::Subreddit.new(subreddit_params)
+      count = 5
+
+      posts = posts_api.top(subreddit, count)
+      unique_posts = posts.uniq { |p| p.reddit_id }
+
+      expect(unique_posts.length).to eq(count)
     end
 
     it "excludes stickied posts that are included by default" do
@@ -18,9 +30,9 @@ describe RedditApi::Posts do
       subreddit_params = { "display_name" => "AskReddit" }
       subreddit = RedditApi::Subreddit.new(subreddit_params)
 
-      result = posts_api.top(subreddit, 5)
+      posts = posts_api.top(subreddit, 5)
 
-      stickied = result.any? { |p| p.stickied }
+      stickied = posts.any? { |p| p.stickied }
       expect(stickied).to be false
     end
   end
