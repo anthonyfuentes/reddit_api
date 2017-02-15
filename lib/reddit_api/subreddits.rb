@@ -1,6 +1,6 @@
 
 module RedditApi
-  class Subreddit
+  class Subreddits
 
     def initialize
       @client = RedditApi::Client.new

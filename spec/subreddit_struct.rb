@@ -1,2 +1,0 @@
-
-Subreddit = Struct.new(:name)

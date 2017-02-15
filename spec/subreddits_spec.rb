@@ -1,10 +1,10 @@
 require "spec_helper"
 
-describe RedditApi::Subreddit do
+describe RedditApi::Subreddits do
 
   describe "#top" do
     it "returns an array of the top n subreddits" do
-      subreddit_api = RedditApi::Subreddit.new
+      subreddit_api = RedditApi::Subreddits.new
       count = 5
 
       result = subreddit_api.top(count)
