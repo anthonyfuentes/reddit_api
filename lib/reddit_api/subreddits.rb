@@ -4,36 +4,36 @@ module RedditApi
 
     def initialize
       @client = RedditApi::Client.new
+      @subreddit_factory = RedditApi::Subreddit
     end
 
     def top(count)
       subreddits_data = top_data(count)
-      cleanse_all_data(subreddits_data)
+      build_all_subreddits(subreddits_data)
     end
 
     private
-    attr_reader :client
+    attr_reader :client, :subreddit_factory
 
     def top_data(count)
       endpoint = "subreddits/popular.json"
       query = { limit: count }
       response = client.get(endpoint, query)
-      response["data"]["children"]
+      extract_top_data(response["data"])
     end
 
-    def cleanse_all_data(subreddits_data)
+    def extract_top_data(response_data)
+      response_data["children"]
+    end
+
+    def build_all_subreddits(subreddits_data)
       subreddits_data.map! do |subreddit_data|
-        cleanse_data(subreddit_data)
+        build_subreddit(subreddit_data)
       end
     end
 
-    def cleanse_data(subreddit_data)
-      {
-        subscriber_count: subreddit_data["data"]["subscribers"],
-        url: subreddit_data["data"]["url"],
-        name: subreddit_data["data"]["display_name"],
-        description: subreddit_data["data"]["public_description"]
-      }
+    def build_subreddit(subreddit_data)
+      subreddit_factory.new(subreddit_data["data"])
     end
 
   end
