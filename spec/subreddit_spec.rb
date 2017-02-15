@@ -2,6 +2,16 @@ require "spec_helper"
 
 describe RedditApi::Subreddit do
 
+  describe "#reddit_id" do
+    it "returns the subreddit's reddit_id" do
+      reddit_id = "AskReddit"
+      params = { "id" => reddit_id }
+      subreddit = RedditApi::Subreddit.new(params)
+
+      expect(subreddit.reddit_id).to eq(reddit_id)
+    end
+  end
+
   describe "#name" do
     it "returns the subreddit's name" do
       name = "AskReddit"
