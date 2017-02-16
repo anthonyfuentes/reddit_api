@@ -17,13 +17,7 @@ module RedditApi
 
     def top_data(count)
       endpoint = "subreddits/popular.json"
-      query = { limit: count }
-      response = client.get(endpoint, query)
-      extract_top_data(response["data"])
-    end
-
-    def extract_top_data(response_data)
-      response_data["children"]
+      client.get(endpoint, count)
     end
 
     def build_all_subreddits(subreddits_data)

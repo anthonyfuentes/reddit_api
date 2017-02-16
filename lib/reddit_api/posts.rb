@@ -17,17 +17,12 @@ module RedditApi
     attr_reader :client, :post_factory
 
     def top_data(subreddit, count)
-      query = { limit: count }
       endpoint = URI.encode("r/#{subreddit.name}/hot.json")
-      client.get(endpoint, query)
+      client.get(endpoint, count)
     end
 
     def filter_out(posts_data, filter)
-      if posts_data["error"]
-        []
-      else
-        send(filter, posts_data["data"]["children"])
-      end
+      send(filter, posts_data)
     end
 
     def stickied_posts(posts_data)

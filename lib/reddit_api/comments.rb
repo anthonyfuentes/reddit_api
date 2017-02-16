@@ -10,7 +10,6 @@ module RedditApi
     def most_recent_subreddits(user, count)
       subreddits = {}
       while subreddits.length < count
-        # must be able to use offset to "see next" comments
         comments = most_recent_comments(user)
         collect_subreddits(comments, count, subreddits)
       end
@@ -19,7 +18,6 @@ module RedditApi
 
     def most_recent_comments(user, count = 100)
       comments_data = most_recent_comment_data(user.username, count)
-      comments_data = filter(comments_data)
       build_all_comments(comments_data)
     end
 
@@ -28,13 +26,8 @@ module RedditApi
 
     def most_recent_comment_data(username, count)
       return [] if username == "[deleted]"
-      query = { limit: count }
       endpoint = "user/#{username}/comments.json"
-      client.get(endpoint, query)
-    end
-
-    def filter(comments_data)
-      comments_data["data"]["children"]
+      client.get(endpoint, count)
     end
 
     def build_all_comments(comments_data)
