@@ -19,24 +19,25 @@ module RedditApi
       @base_url = "https://oauth.reddit.com/"
       @failures = args.fetch(:failures, 0)
       @null_response_factory = RedditApi:: NullResponse
+      @last_record = nil
     end
 
-    def get(endpoint, count)
+    def get(endpoint, count, resource_type)
       sleep(3)
       records = {}
       loop do
-        record_count = records.length
-        new_records = request_records(endpoint, count, record_count)
+        new_records = request_records(endpoint, resource_type)
         collect_records(new_records, records, count)
         break if break_get?(records, count)
       end
+      self.last_record = nil
       records.keys
     end
 
     protected
-    attr_writer :failures
+    attr_writer :failures, :last_record
     private
-    attr_reader :client, :base_url, :null_response_factory
+    attr_reader :client, :base_url, :null_response_factory, :last_record
 
     def collect_records(new_records, collected_records, count)
       new_records.each do |record|
@@ -45,15 +46,15 @@ module RedditApi
       end
     end
 
-    def request_records(endpoint, desired_count, current_count)
-      response = send_request(endpoint, desired_count, current_count)
+    def request_records(endpoint, resource_type)
+      response = send_request(endpoint, resource_type)
       parse_response(response)
     end
 
-    def send_request(endpoint, desired_count, current_count)
+    def send_request(endpoint, resource_type)
       url = base_url + endpoint
       headers = generate_headers
-      query = generate_query(desired_count, current_count)
+      query = generate_query(resource_type)
       response = client.get(url, headers: headers, query: query)
       response || null_response_factory.new
     end
@@ -77,21 +78,19 @@ module RedditApi
 
     def handle_successful_response(response)
       if records = response["data"]["children"]
-        records
+        store_last_record(records)
       else
         bad_response
       end
     end
 
-    def break_get?(records, desired_count)
-      records.length >= desired_count || failures >= MAX_FAILURES
+    def store_last_record(records)
+      self.last_record = records[-1]
+      records
     end
 
-    def generate_query(desired_count, current_count)
-      {
-        limit: MAXIMUM_RECORDS,
-        after: current_count
-      }
+    def break_get?(records, desired_count)
+      records.length >= desired_count || failures >= MAX_FAILURES
     end
 
     def generate_headers
@@ -100,6 +99,27 @@ module RedditApi
         "Authorization" => "bearer #{access_token}",
         "user-agent" => agent
       }
+    end
+
+    def generate_query(resource_type)
+      {
+        limit: MAXIMUM_RECORDS,
+        after: generate_after(resource_type)
+      }
+    end
+
+    def generate_after(resource_type)
+      if last_record
+        build_after(resource_type)
+      else
+        nil
+      end
+    end
+
+    def build_after(resource_type)
+      prefix = TYPE_PREFIXES[resource_type]
+      last_resource_id = last_record["data"]["id"]
+      "#{prefix}_#{last_resource_id}"
     end
 
     def generate_access_token

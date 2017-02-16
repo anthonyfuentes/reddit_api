@@ -67,7 +67,7 @@ describe RedditApi::Client do
 
         expect(external_client).to receive(:get).and_return(response)
 
-        client.get("url", 10)
+        client.get("url", 10, :subreddit)
       end
 
       it "will return when failures reaches MAX_FAILURES" do
@@ -75,7 +75,7 @@ describe RedditApi::Client do
         client = RedditApi::Client.new(failures: failures)
         max_failures = RedditApi::Client::MAX_FAILURES
 
-        client.get("url", 1000)
+        client.get("url", 1000, :subreddit)
 
         expect(client.failures).to eq(max_failures)
       end
@@ -85,22 +85,46 @@ describe RedditApi::Client do
         url = "subreddits/popular.json"
         count = 10
 
-        resources = client.get(url, count)
+        resources = client.get(url, count, :subreddit)
 
         expect(resources.length).to eq(count)
+      end
+
+      it "resources are unique" do
+        client = RedditApi::Client.new
+        url = "subreddits/popular.json"
+        count = 10
+
+        resources = client.get(url, count, :subreddit)
+        unique_resources = resources.uniq { |r| r["data"]["id"] }
+
+        expect(unique_resources.length).to eq(count)
       end
     end
   end
 
-  context "when count within single api request limit of 100" do
-    it "can return more than the 100 api call limit" do
-      client = RedditApi::Client.new
-      url = "subreddits/popular.json"
-      count = 150
+  context "when count greater than single api request limit of 100" do
+    describe "#get" do
+      it "can return more than the 100 api call limit" do
+        client = RedditApi::Client.new
+        url = "subreddits/popular.json"
+        count = 150
 
-      resources = client.get(url, count)
+        resources = client.get(url, count, :subreddit)
 
-      expect(resources.length).to eq(count)
+        expect(resources.length).to eq(count)
+      end
+
+      it "resources are unique" do
+        client = RedditApi::Client.new
+        url = "subreddits/popular.json"
+        count = 150
+
+        resources = client.get(url, count, :subreddit)
+        unique_resources = resources.uniq { |r| r["data"]["id"] }
+
+        expect(unique_resources.length).to eq(count)
+      end
     end
   end
 
