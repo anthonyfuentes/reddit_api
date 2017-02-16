@@ -47,6 +47,16 @@ describe RedditApi::Comments do
 
       expect(authored_by_user).to be true
     end
+
+    it "returns comment objects" do
+      comments_api = RedditApi::Comments.new
+      user = RedditApi::User.new({ "username" => "spez" })
+
+      comments = comments_api.most_recent_comments(user, 5)
+      all_comments_objects = comments.all? { |c| c.is_a?(RedditApi::Comment) }
+
+      expect(all_comments_objects).to be true
+    end
   end
 
 end

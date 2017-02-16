@@ -21,6 +21,17 @@ describe RedditApi::Subreddits do
 
       expect(unique_subreddits.length).to eq(count)
     end
+
+    it "returns subreddit objects" do
+      subreddit_api = RedditApi::Subreddits.new
+
+      subreddits = subreddit_api.top(5)
+      all_subreddit_objects = subreddits.all? do |s|
+        s.is_a?(RedditApi::Subreddit)
+      end
+
+      expect(all_subreddit_objects).to be true
+    end
   end
 
 end

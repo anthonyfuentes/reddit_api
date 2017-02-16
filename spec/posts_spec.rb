@@ -7,10 +7,11 @@ describe RedditApi::Posts do
       posts_api = RedditApi::Posts.new
       subreddit_params = { "display_name" => "AskReddit" }
       subreddit = RedditApi::Subreddit.new(subreddit_params)
+      count = 5
 
-      posts = posts_api.top(subreddit, 5)
+      posts = posts_api.top(subreddit, count)
 
-      expect(posts.length).to eq(5)
+      expect(posts.length).to eq(count)
     end
 
     it "posts are unique" do
@@ -34,6 +35,17 @@ describe RedditApi::Posts do
 
       stickied = posts.any? { |p| p.stickied }
       expect(stickied).to be false
+    end
+
+    it "returns post objects" do
+      posts_api = RedditApi::Posts.new
+      subreddit_params = { "display_name" => "AskReddit" }
+      subreddit = RedditApi::Subreddit.new(subreddit_params)
+
+      posts = posts_api.top(subreddit, 5)
+      all_post_objects = posts.all? { |p| p.is_a?(RedditApi::Post) }
+
+      expect(all_post_objects).to be true
     end
   end
 
