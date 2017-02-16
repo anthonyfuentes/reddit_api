@@ -18,7 +18,7 @@ module RedditApi
 
     def top_data(subreddit, count)
       endpoint = URI.encode("r/#{subreddit.name}/hot.json")
-      client.get(endpoint, count)
+      client.get(endpoint, count, :post)
     end
 
     def filter_out(posts_data, filter)

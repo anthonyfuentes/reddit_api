@@ -17,7 +17,7 @@ module RedditApi
 
     def top_data(count)
       endpoint = "subreddits/popular.json"
-      client.get(endpoint, count)
+      client.get(endpoint, count, :subreddit)
     end
 
     def build_all_subreddits(subreddits_data)

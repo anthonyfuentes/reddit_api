@@ -27,7 +27,7 @@ module RedditApi
     def most_recent_comment_data(username, count)
       return [] if username == "[deleted]"
       endpoint = "user/#{username}/comments.json"
-      client.get(endpoint, count)
+      client.get(endpoint, count, :comment)
     end
 
     def build_all_comments(comments_data)
