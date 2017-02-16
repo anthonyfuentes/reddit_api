@@ -28,7 +28,7 @@ module RedditApi
         record_count = records.length
         new_records = request_records(endpoint, count, record_count)
         collect_records(new_records, records, count)
-        break if get_break?(new_records, count)
+        break if break_get?(records, count)
       end
       records.keys
     end
@@ -83,14 +83,14 @@ module RedditApi
       end
     end
 
-    def get_break?(records, desired_count)
+    def break_get?(records, desired_count)
       records.length >= desired_count || failures >= MAX_FAILURES
     end
 
     def generate_query(desired_count, current_count)
       {
         limit: MAXIMUM_RECORDS,
-        after: "TODO"
+        after: current_count
       }
     end
 

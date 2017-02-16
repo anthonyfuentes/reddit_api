@@ -2,20 +2,20 @@ require "spec_helper"
 
 describe RedditApi::Client do
 
-  describe "#failures" do
-    it "returns the client's number of failures" do
-      failures = 2
-      client = RedditApi::Client.new(failures: failures)
-      expect(client.failures).to eq(failures)
+  context "when initialized" do
+    describe "#failures" do
+      it "returns the client's number of failures" do
+        failures = 2
+        client = RedditApi::Client.new(failures: failures)
+        expect(client.failures).to eq(failures)
+      end
+
+      it "defaults to 0" do
+        client = RedditApi::Client.new()
+        expect(client.failures).to eq(0)
+      end
     end
 
-    it "defaults to 0" do
-      client = RedditApi::Client.new()
-      expect(client.failures).to eq(0)
-    end
-  end
-
-  context "when ready to make requests" do
     describe "#agent" do
       it "returns client agent" do
         client = RedditApi::Client.new
@@ -50,7 +50,10 @@ describe RedditApi::Client do
         expect(client.username).to_not be_nil
       end
     end
+  end
 
+
+  context "when count within single api request limit of 100" do
     describe "#get" do
       it "uses external client to send get request" do
         external_client = double()
@@ -72,13 +75,13 @@ describe RedditApi::Client do
         client = RedditApi::Client.new(failures: failures)
         max_failures = RedditApi::Client::MAX_FAILURES
 
-        client.get("url", 10)
+        client.get("url", 1000)
 
         expect(client.failures).to eq(max_failures)
       end
 
       it "returns n resources from a given endpoint" do
-        client = RedditApi::Client.new()
+        client = RedditApi::Client.new
         url = "subreddits/popular.json"
         count = 10
 
@@ -89,5 +92,18 @@ describe RedditApi::Client do
     end
   end
 
+  context "when count within single api request limit of 100" do
+    it "can return more than the 100 api call limit" do
+      client = RedditApi::Client.new
+      url = "subreddits/popular.json"
+      count = 150
+
+      resources = client.get(url, count)
+
+      expect(resources.length).to eq(count)
+    end
+  end
+
 end
+
 
