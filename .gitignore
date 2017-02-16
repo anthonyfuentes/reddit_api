@@ -10,3 +10,6 @@
 
 # Ignore application configuration
 .env
+
+# Ignore todo
+todo.txt
