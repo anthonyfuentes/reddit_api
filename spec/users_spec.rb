@@ -33,6 +33,16 @@ describe RedditApi::Users do
 
       expect(unique_users.length).to eq(count)
     end
+
+    it "returns if misses is equal to max misses" do
+      misses = RedditApi::Users::MAX_MISSES
+      users_api = RedditApi::Users.new(misses: misses)
+      subreddit = RedditApi::Subreddit.new({ "display_name" => "AskReddit" })
+
+      result = users_api.top_posters(subreddit, 10)
+
+      expect(result.length).to eq(0)
+    end
   end
 
 end
