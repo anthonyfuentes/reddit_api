@@ -1,5 +1,6 @@
 require "reddit_api/version"
 require "dotenv/load"
+require "reddit_api/null_response"
 require "reddit_api/client"
 require "reddit_api/subreddits"
 require "reddit_api/subreddit"
