@@ -52,6 +52,46 @@ describe RedditApi::Subreddit do
     end
   end
 
+  describe "#subreddit_icon" do
+    it "returns the subreddit's icon" do
+      icon = "img"
+      params = { "header_img" => icon }
+      subreddit = RedditApi::Subreddit.new(params)
+
+      expect(subreddit.icon).to eq(icon)
+    end
+  end
+
+  describe "#category" do
+    it "returns the subreddit's category" do
+      category = "img"
+      params = { "advertiser_category" => category }
+      subreddit = RedditApi::Subreddit.new(params)
+
+      expect(subreddit.category).to eq(category)
+    end
+  end
+
+  describe "#active_users" do
+    it "returns the subreddit's active users" do
+      active_users = 2
+      params = { "accounts_active" => active_users }
+      subreddit = RedditApi::Subreddit.new(params)
+
+      expect(subreddit.active_users).to eq(active_users)
+    end
+  end
+
+  describe "#nsfw" do
+    it "returns the subreddit's nsfw status" do
+      nsfw = false
+      params = { "over18" => nsfw }
+      subreddit = RedditApi::Subreddit.new(params)
+
+      expect(subreddit.nsfw).to eq(nsfw)
+    end
+  end
+
   describe "#to_h" do
     it "returns a hash representation of the subreddit" do
       subreddit = RedditApi::Subreddit.new
