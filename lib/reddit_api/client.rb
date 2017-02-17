@@ -3,11 +3,21 @@ require "httparty"
 module RedditApi
   class Client
 
+    def self.sleep_time
+      if ENV["ENVIRONMENT"] == "TEST"
+        0
+      else
+        3
+      end
+    end
+
     attr_reader :agent, :id, :password, :secret, :username, :failures
 
     MAXIMUM_RECORDS = 100
     MAX_FAILURES = 5
     ERROR_CODES = (400..511)
+    SLEEP_TIME = self.sleep_time
+
 
     def initialize(args = {})
       @agent = ENV["REDDIT_AGENT"]
@@ -23,7 +33,7 @@ module RedditApi
     end
 
     def get(endpoint, count, resource_type)
-      sleep(3)
+      sleep(SLEEP_TIME)
       records = {}
       loop do
         new_records = request_records(endpoint, resource_type)

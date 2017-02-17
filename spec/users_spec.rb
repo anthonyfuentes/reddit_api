@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe RedditApi::Users do
+describe RedditApi::Users, :vcr do
 
   describe "#top_posters" do
     it "returns n authors of the top posts from a subreddit" do

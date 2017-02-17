@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe RedditApi::Client do
+describe RedditApi::Client, :vcr do
 
   context "when initialized" do
     describe "#failures" do

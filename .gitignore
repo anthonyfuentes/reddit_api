@@ -13,3 +13,6 @@
 
 # Ignore todo
 todo.txt
+
+# Ignore cassettes
+spec/cassettes

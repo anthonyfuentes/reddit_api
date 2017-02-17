@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe RedditApi::Comments do
+describe RedditApi::Comments, :vcr do
 
   context "when count within single api request limit of 100" do
     describe "#most_recent_subreddits" do

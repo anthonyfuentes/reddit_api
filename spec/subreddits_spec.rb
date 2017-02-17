@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe RedditApi::Subreddits do
+describe RedditApi::Subreddits, :vcr do
 
   context "when count within single api request limit of 100" do
     describe "#top" do
