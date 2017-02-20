@@ -47,12 +47,17 @@ module RedditApi
         new_records = request_records(endpoint, count, resource_type)
         collect_records(new_records, records, count)
       end
-      self.last_record = nil
+      after_collection
       records.keys
     end
 
     def get_one(endpoint, count, resource_type)
       request_records(endpoint, count, resource_type)
+    end
+
+    def request_records(endpoint, count, resource_type)
+      response = send_request(endpoint, resource_type)
+      parse_response(response, count)
     end
 
     def collect_records(new_records, collected_records, count)
@@ -62,9 +67,9 @@ module RedditApi
       end
     end
 
-    def request_records(endpoint, count, resource_type)
-      response = send_request(endpoint, resource_type)
-      parse_response(response, count)
+    def after_collection
+      self.last_record = nil
+      self.failures = 0
     end
 
     def send_request(endpoint, resource_type)

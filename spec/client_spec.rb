@@ -34,16 +34,6 @@ describe RedditApi::Client, :vcr do
         client.get("url", 10, :subreddit)
       end
 
-      it "will return when failures reaches MAX_FAILURES" do
-        failures = 4
-        client = RedditApi::Client.new(failures: failures)
-        max_failures = RedditApi::Client::MAX_FAILURES
-
-        client.get("url", 1000, :subreddit)
-
-        expect(client.failures).to eq(max_failures)
-      end
-
       it "returns n resources from a given endpoint" do
         client = RedditApi::Client.new
         url = "subreddits/popular.json"
