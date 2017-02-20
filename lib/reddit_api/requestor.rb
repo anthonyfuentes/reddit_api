@@ -43,7 +43,7 @@ module RedditApi
         if last_record
           build_after(resource_type, last_record)
         else
-          nil
+          ""
         end
       end
 
