@@ -1,6 +1,7 @@
 require "bundler/setup"
 Bundler.setup
 require "vcr"
+require "test_env"
 require "reddit_api"
 
 RSpec.configure do |config|

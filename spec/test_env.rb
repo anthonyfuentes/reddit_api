@@ -1,0 +1,3 @@
+
+ENV["ENVIRONMENT"] = "TEST"
+
