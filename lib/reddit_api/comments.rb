@@ -2,7 +2,7 @@
 module RedditApi
   class Comments
 
-    MAX_FAILURES = 5
+    MAX_QUERIES = 5
 
     def initialize(args = {})
       @client = args.fetch(:client, RedditApi::Client.new)
@@ -14,10 +14,11 @@ module RedditApi
     def most_recent_subreddits(user, count)
       self.failures = 0
       subreddits = {}
-      while subreddits.length < count && failures < MAX_FAILURES
+      MAX_QUERIES.times do
         comments = most_recent_comments(user, 100, offset)
         update_progress(comments)
         collect_subreddits(comments, count, subreddits)
+        break if subreddits.length >= count || failures >= MAX_QUERIES
       end
       subreddits.keys
     end
