@@ -65,8 +65,8 @@ describe RedditApi::Comments, :vcr do
     describe "#most_recent_subreddits" do
       it "returns the names of n subreddits given user has commented on" do
         comments_api = RedditApi::Comments.new
-        user = RedditApi::User.new({ "username" => "spez" })
-        count = 5
+        user = RedditApi::User.new({ "username" => "Squeagley" })
+        count = 10
 
         subreddits = comments_api.most_recent_subreddits(user, count)
 

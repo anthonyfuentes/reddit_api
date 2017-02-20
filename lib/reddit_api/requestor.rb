@@ -49,8 +49,16 @@ module RedditApi
 
     def build_after(resource_type, record)
       prefix = TYPE_PREFIXES[resource_type]
-      last_resource_id = record["data"]["id"]
+      last_resource_id = record_id(record)
       "#{prefix}_#{last_resource_id}"
+    end
+
+    def record_id(record)
+      if record.is_a?(Hash)
+        record["data"]["id"]
+      else
+        record
+      end
     end
 
     def generate_access_token

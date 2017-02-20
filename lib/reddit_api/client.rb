@@ -25,9 +25,9 @@ module RedditApi
       @last_record = nil
     end
 
-    def get(endpoint, count, resource_type)
+    def get(endpoint, count, resource_type, offset = nil)
       if count > 1
-        get_many(endpoint, count, resource_type)
+        get_many(endpoint, count, resource_type, offset)
       else
         get_one(endpoint, count, resource_type)
       end
@@ -39,20 +39,20 @@ module RedditApi
     attr_reader :client, :base_url, :null_response_factory, :last_record,
                 :requestor
 
-    def get_many(endpoint, count, resource_type)
+    def get_many(endpoint, count, resource_type, offset)
       sleep(SLEEP_TIME)
       records = {}
-      loop do
-        new_records = request_records(endpoint, resource_type, count)
+      self.last_record = offset
+      while !break_get?(records, count)
+        new_records = request_records(endpoint, count, resource_type)
         collect_records(new_records, records, count)
-        break if break_get?(records, count)
       end
       self.last_record = nil
       records.keys
     end
 
     def get_one(endpoint, count, resource_type)
-      request_records(endpoint, resource_type, count)
+      request_records(endpoint, count, resource_type)
     end
 
     def collect_records(new_records, collected_records, count)
@@ -62,7 +62,7 @@ module RedditApi
       end
     end
 
-    def request_records(endpoint, resource_type, count)
+    def request_records(endpoint, count, resource_type)
       response = send_request(endpoint, resource_type)
       parse_response(response, count)
     end

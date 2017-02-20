@@ -2,32 +2,36 @@
 module RedditApi
   class Comments
 
-    def initialize
-      @client = RedditApi::Client.new
+    def initialize(args = {})
+      @client = args.fetch(:client, RedditApi::Client.new)
       @comment_factory = RedditApi::Comment
+      @offset = nil
     end
 
     def most_recent_subreddits(user, count)
       subreddits = {}
       while subreddits.length < count
-        comments = most_recent_comments(user)
+        comments = most_recent_comments(user, 100, offset)
+        self.offset = comments.last.reddit_id
         collect_subreddits(comments, count, subreddits)
       end
       subreddits.keys
     end
 
-    def most_recent_comments(user, count = 100)
-      comments_data = most_recent_comment_data(user.username, count)
+    def most_recent_comments(user, count = 100, offset = nil)
+      comments_data = most_recent_comment_data(user.username, count, offset)
       build_all_comments(comments_data)
     end
 
+    protected
+    attr_writer :offset
     private
-    attr_reader :client, :comment_factory
+    attr_reader :client, :comment_factory, :offset
 
-    def most_recent_comment_data(username, count)
+    def most_recent_comment_data(username, count, offset)
       return [] if username == "[deleted]"
       endpoint = "user/#{username}/comments.json"
-      client.get(endpoint, count, :comment)
+      client.get(endpoint, count, :comment, offset)
     end
 
     def build_all_comments(comments_data)
