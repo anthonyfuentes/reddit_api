@@ -41,7 +41,7 @@ describe RedditApi::Comments, :vcr do
         comments_api = RedditApi::Comments.new
         user = RedditApi::User.new({ "username" => "spez" })
 
-        comments = comments_api.most_recent_comments(user, 1)
+        comments = comments_api.most_recent_comments(user, 10)
         authored_by_user = comments.all? do |comment|
           comment.author_name == user.username
         end
