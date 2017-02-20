@@ -29,7 +29,7 @@ module RedditApi
     protected
     attr_writer :offset
     private
-    attr_reader :client, :comment_factory, :offset
+    attr_reader :client, :comment_factory, :offset, :failures
 
     def update_progress(comments)
       if offset == comments.last.reddit_id
