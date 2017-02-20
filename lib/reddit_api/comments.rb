@@ -27,13 +27,14 @@ module RedditApi
     end
 
     protected
-    attr_writer :offset
+    attr_accessor :failures
+    attr_writer :offset, :failures
     private
-    attr_reader :client, :comment_factory, :offset, :failures
+    attr_reader :client, :comment_factory, :offset
 
     def update_progress(comments)
-      if offset == comments.last.reddit_id
-        failures += 1
+      if comments.empty?
+        self.failures += 1
       else
         self.offset = comments.last.reddit_id
       end
