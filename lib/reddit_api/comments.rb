@@ -2,17 +2,20 @@
 module RedditApi
   class Comments
 
+    MAX_FAILURES = 5
+
     def initialize(args = {})
       @client = args.fetch(:client, RedditApi::Client.new)
       @comment_factory = RedditApi::Comment
       @offset = nil
+      @failures = 0
     end
 
     def most_recent_subreddits(user, count)
       subreddits = {}
-      while subreddits.length < count
+      while subreddits.length < count && failures < MAX_FAILURES
         comments = most_recent_comments(user, 100, offset)
-        self.offset = comments.last.reddit_id
+        update_progress(comments)
         collect_subreddits(comments, count, subreddits)
       end
       subreddits.keys
@@ -27,6 +30,14 @@ module RedditApi
     attr_writer :offset
     private
     attr_reader :client, :comment_factory, :offset
+
+    def update_progress(comments)
+      if offset == comments.last.reddit_id
+        failures += 1
+      else
+        self.offset = comments.last.reddit_id
+      end
+    end
 
     def most_recent_comment_data(username, count, offset)
       return [] if username == "[deleted]"
