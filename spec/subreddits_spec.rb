@@ -34,6 +34,18 @@ describe RedditApi::Subreddits, :vcr do
         expect(all_subreddit_objects).to be true
       end
     end
+
+    describe "#data_for" do
+      it "returns Subreddit object representing the given subreddit" do
+        subreddit = double()
+        allow(subreddit).to receive(:name).and_return("AskReddit")
+        subreddit_api = RedditApi::Subreddits.new
+
+        subreddit = subreddit_api.data_for(subreddit)
+
+        expect(subreddit).to be_a(RedditApi::Subreddit)
+      end
+    end
   end
 
   context "when count greater than single api request limit of 100" do

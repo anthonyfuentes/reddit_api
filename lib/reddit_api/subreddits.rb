@@ -12,6 +12,12 @@ module RedditApi
       build_all_subreddits(subreddits_data)
     end
 
+    def data_for(subreddit)
+      endpoint = "r/#{subreddit.name}/about.json"
+      response = client.get(endpoint, 1, :subreddit)
+      build_subreddit(response)
+    end
+
     private
     attr_reader :client, :subreddit_factory
 
