@@ -16,7 +16,7 @@ module RedditApi
       subreddits = {}
       loops = 0
       while subreddits.length < count &&
-          failures < MAX_QUERIES &&
+          failures < MAX_FAILURES &&
           loops < MAX_FAILURES
         comments = most_recent_comments(user, 100, offset)
         update_progress(comments)
