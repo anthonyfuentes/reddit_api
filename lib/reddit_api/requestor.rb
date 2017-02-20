@@ -4,10 +4,10 @@ module RedditApi
 
       MAXIMUM_RECORDS = 100
       AGENT = ENV["REDDIT_AGENT"]
-      ID = ENV["REDDIT_AGENT"]
-      PASSWORD = ENV["REDDIT_AGENT"]
-      SECRET = ENV["REDDIT_AGENT"]
-      USERNAME = ENV["REDDIT_AGENT"]
+      ID = ENV["REDDIT_ID"]
+      PASSWORD = ENV["REDDIT_PASSWORD"]
+      SECRET = ENV["REDDIT_SECRET"]
+      USERNAME = ENV["REDDIT_USERNAME"]
       BASE_URL = "https://oauth.reddit.com/"
 
       def initialize(args = {})
@@ -43,7 +43,7 @@ module RedditApi
         if last_record
           build_after(resource_type, last_record)
         else
-          nil
+          ""
         end
       end
 
