@@ -12,6 +12,7 @@ module RedditApi
     end
 
     def most_recent_subreddits(user, count)
+      self.failures = 0
       subreddits = {}
       while subreddits.length < count && failures < MAX_FAILURES
         comments = most_recent_comments(user, 100, offset)
