@@ -4,7 +4,7 @@ module RedditApi
   class Client
 
     def self.sleep_time
-      if ENV["ENVIRONMENT"] == "TEST"
+      if ENV["ENVIRONMENT"] == "TEST" || ENV["RAILS_ENV"] == "test"
         0
       else
         3
