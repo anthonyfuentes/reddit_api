@@ -5,6 +5,7 @@ module RedditApi
     def initialize
       @client = RedditApi::Client.new
       @post_factory = RedditApi::Post
+      @query_factory =  RedditApi::Query
     end
 
     def top(subreddit, count)
@@ -14,11 +15,19 @@ module RedditApi
     end
 
     private
-    attr_reader :client, :post_factory
+    attr_reader :client, :post_factory, :query_factory
 
     def top_data(subreddit, count)
+      query = build_query(subreddit, count)
+      client.get(query)
+      query.captured_records
+    end
+
+    def build_query(subreddit, count)
       endpoint = URI.encode("r/#{subreddit.name}/hot.json")
-      client.get(endpoint, count, :post)
+      query_factory.new(count: count,
+                        endpoint: endpoint,
+                        resource: :post)
     end
 
     def filter_out(posts_data, filter)
