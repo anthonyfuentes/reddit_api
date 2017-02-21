@@ -39,6 +39,7 @@ module RedditApi
     attr_reader :client, :null_response_factory, :requestor, :parser
 
     def send_request(query)
+      sleep(SLEEP_TIME)
       request = requestor.build(query)
       response = client.get(*request)
       response || null_response_factory.new
