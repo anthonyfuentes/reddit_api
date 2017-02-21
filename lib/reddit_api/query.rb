@@ -21,7 +21,7 @@ module RedditApi
     end
 
     def captured_records
-      records.keys
+      records.values
     end
 
     def capture_count
@@ -41,12 +41,17 @@ module RedditApi
     end
 
     def add_single_record(record)
-      records[record] = true
+      record_id = record_id(record)
+      records[record_id] = record
       update_offset_id(record)
     end
 
     def update_offset_id(record)
-      self.offset_id = record["data"]["id"]
+      self.offset_id = record_id(record)
+    end
+
+    def record_id(record)
+      record["data"]["id"]
     end
 
   end

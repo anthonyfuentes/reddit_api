@@ -109,10 +109,11 @@ describe RedditApi::Query do
         }.to change(query, :capture_count).by(query.count)
       end
 
-      it "filters out duplicate records" do
+      it "adds unique records based on record id" do
         query = RedditApi::Query.new(count: 3)
         record = RecordStub.new(id: 0)
-        records = Array.new(3) { record }
+        duplicate = RecordStub.new(id: 0)
+        records = [record, duplicate]
 
         expect{
           query.add_records(records)
