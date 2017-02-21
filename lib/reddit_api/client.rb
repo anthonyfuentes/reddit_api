@@ -11,117 +11,58 @@ module RedditApi
       end
     end
 
-    attr_reader :agent, :id, :password, :secret, :username, :failures
-
-    MAX_FAILURES = 5
-    ERROR_CODES = (400..511)
     SLEEP_TIME = self.sleep_time
+    MAX_FAILURES = 5
+
+    attr_reader :failures
 
     def initialize(args = {})
       @client = args.fetch(:client, HTTParty)
       @requestor = args.fetch(:requestor, RedditApi::Requestor.new(client: client))
-      @failures = args.fetch(:failures, 0)
+      @parser = args.fetch(:parser, RedditApi::ResponseParser)
       @null_response_factory = RedditApi:: NullResponse
-      @last_record = nil
+      @failures = args.fetch(:failures, 0)
     end
 
-    def get(endpoint, count, resource_type, offset = nil)
-      if count > 1
-        get_many(endpoint, count, resource_type, offset)
-      else
-        get_one(endpoint, count, resource_type)
+    def get(query)
+      while query.records_captured < query.count && failures < MAX_FAILURES
+        response = send_request(query)
+        response = parser.parse_response(response, query.count)
+        update_progress(query, response)
       end
+      reset_failures
     end
 
     protected
-    attr_writer :failures, :last_record
+    attr_writer :failures
     private
-    attr_reader :client, :base_url, :null_response_factory, :last_record,
-                :requestor
+    attr_reader :client, :null_response_factory, :requestor, :parser
 
-    def get_many(endpoint, count, resource_type, offset)
-      sleep(SLEEP_TIME)
-      records = {}
-      self.last_record = offset
-      while !break_get?(records, count)
-        new_records = request_records(endpoint, count, resource_type)
-        collect_records(new_records, records, count)
-      end
-      after_collection
-      records.keys
-    end
-
-    def get_one(endpoint, count, resource_type)
-      request_records(endpoint, count, resource_type)
-    end
-
-    def request_records(endpoint, count, resource_type)
-      response = send_request(endpoint, resource_type)
-      parse_response(response, count)
-    end
-
-    def collect_records(new_records, collected_records, count)
-      new_records.each do |record|
-        collected_records[record] = true
-        break if collected_records.length == count
-      end
-    end
-
-    def after_collection
-      self.last_record = nil
-      self.failures = 0
-    end
-
-    def send_request(endpoint, resource_type)
-      request = requestor.build(endpoint, resource_type, last_record)
+    def send_request(query)
+      request = requestor.build(query)
       response = client.get(*request)
       response || null_response_factory.new
     end
 
-    def parse_response(response, count)
-      if bad_response?(response)
-        handle_bad_response(count)
-      else
-        handle_successful_response(response, count)
+    def update_progress(query, response)
+      captured_before = query.records_captured
+      update_query(query, response)
+      captured_after = query.records_captured
+      update_failures(captured_before, captured_after, query.count)
+    end
+
+    def update_query(query, response)
+      query.add_records(response)
+    end
+
+    def update_failures(captured_before, captured_after, count)
+      if captured_before >= captured_after
+        self.failures += 1
       end
     end
 
-    def bad_response?(response)
-      ERROR_CODES.cover?(response.code) || response["error"]
-    end
-
-    def handle_bad_response(count)
-      self.failures += 1
-      if count > 1
-        []
-      else
-        nil
-      end
-    end
-
-    def handle_successful_response(response, count)
-      if count > 1
-        handle_plural_response(response)
-      else
-        response
-      end
-    end
-
-    def handle_plural_response(response)
-      if records = response["data"]["children"]
-        store_last_record(records)
-      else
-        handle_bad_response
-      end
-    end
-
-    def store_last_record(records)
-      self.last_record = records[-1]
-      records
-    end
-
-    def break_get?(records, desired_count)
-      records.length >= desired_count || failures >= MAX_FAILURES
+    def reset_failures
+      self.failures = 0
     end
 
   end

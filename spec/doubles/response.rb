@@ -7,14 +7,13 @@ class ResponseStub
   DEFAULT_DATA = { "children" => [RecordStub.new] }
   DEFAULT_ERROR = nil
 
+  attr_reader :code
+
   def initialize(args = {})
     @access_token = args.fetch(:token, DEFAULT_TOKEN)
     @code = args.fetch(:code, DEFAULT_CODE)
     @data = args.fetch(:data, DEFAULT_DATA)
     @error = args.fetch(:error, DEFAULT_ERROR)
-  end
-
-  def code
   end
 
   def [](key)

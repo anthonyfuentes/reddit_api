@@ -10,6 +10,10 @@ class ExternalClientStub
     @response = args.fetch(:response, DEFAULT_RESPONSE)
   end
 
+  def get(*args)
+    response
+  end
+
   def post(url, options)
     response
   end
