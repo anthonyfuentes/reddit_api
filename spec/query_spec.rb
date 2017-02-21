@@ -49,12 +49,12 @@ describe RedditApi::Query do
     end
   end
 
-  describe "#records_captured" do
+  describe "#capture_count" do
     it "returns the number of records captured for the query" do
       records = Array.new(3)
       query = RedditApi::Query.new(count: 1, records: records)
 
-      expect(query.records_captured).to eq(records.length)
+      expect(query.capture_count).to eq(records.length)
     end
   end
 
@@ -75,7 +75,7 @@ describe RedditApi::Query do
 
         expect{
           query.add_records(record)
-        }.to change(query, :records_captured).by(1)
+        }.to change(query, :capture_count).by(1)
       end
 
       it "updates the offset id" do
@@ -97,7 +97,7 @@ describe RedditApi::Query do
 
         expect{
           query.add_records(records)
-        }.to change(query, :records_captured).by(records.length)
+        }.to change(query, :capture_count).by(records.length)
       end
 
       it "only adds records up to desired count" do
@@ -106,7 +106,7 @@ describe RedditApi::Query do
 
         expect{
           query.add_records(records)
-        }.to change(query, :records_captured).by(query.count)
+        }.to change(query, :capture_count).by(query.count)
       end
 
       it "filters out duplicate records" do
@@ -116,7 +116,7 @@ describe RedditApi::Query do
 
         expect{
           query.add_records(records)
-        }.to change(query, :records_captured).by(1)
+        }.to change(query, :capture_count).by(1)
       end
 
       it "updates offset id even when added records do not reach count" do

@@ -24,7 +24,7 @@ module RedditApi
       records.keys
     end
 
-    def records_captured
+    def capture_count
       records.length
     end
 
