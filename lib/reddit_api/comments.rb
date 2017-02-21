@@ -4,27 +4,26 @@ module RedditApi
 
     DEFAULT_MAX_MISSES = 2
 
+    attr_reader :misses
+
     def initialize(args = {})
       @client = args.fetch(:client, RedditApi::Client.new)
       @comment_factory = RedditApi::Comment
       @query_factory =  RedditApi::Query
       @offset = nil
-      @misses = 0
       @max_misses = args.fetch(:max_miss, DEFAULT_MAX_MISSES)
+      @misses = args.fetch(:misses, 0)
+      @last_count = 0
     end
 
     def most_recent_subreddits(user, count)
-      self.misses = 0
       subreddits = {}
-      loops = 0
-      while subreddits.length < count &&
-          misses < max_misses &&
-          loops < max_misses
+      while subreddits.length < count && misses < max_misses
         comments = most_recent_comments(user, 100, offset)
-        update_progress(comments)
         collect_subreddits(comments, count, subreddits)
-        loops += 1
+        update_progress(comments, subreddits.length)
       end
+      reset_misses
       subreddits.keys
     end
 
@@ -34,8 +33,8 @@ module RedditApi
     end
 
     protected
-    attr_accessor :misses
-    attr_writer :offset
+    attr_writer :offset, :misses
+    attr_accessor  :last_count
     private
     attr_reader :client, :comment_factory, :offset, :query_factory,
                 :max_misses
@@ -55,12 +54,17 @@ module RedditApi
                         offset: offset)
     end
 
-    def update_progress(comments)
-      if comments.empty?
+    def update_progress(comments, new_count)
+      if comments.empty? || last_count >= new_count
         self.misses += 1
       else
         self.offset = comments.last.reddit_id
+        self.last_count += new_count
       end
+    end
+
+    def reset_misses
+      self.misses = 0
     end
 
     def build_all_comments(comments_data)

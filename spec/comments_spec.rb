@@ -12,6 +12,16 @@ describe RedditApi::Comments, :vcr do
 
       expect(subreddits.length).to eq(count)
     end
+
+    it "resets misses to 0 after collecting subreddits" do
+      max_misses = RedditApi::Comments::DEFAULT_MAX_MISSES
+      comments_api = RedditApi::Comments.new(misses: max_misses)
+      user = RedditApi::User.new({ "username" => "spez" })
+
+      comments_api.most_recent_subreddits(user, 100)
+
+      expect(comments_api.misses).to eq(0)
+    end
   end
 
   context "when count within single api request limit of 100" do
