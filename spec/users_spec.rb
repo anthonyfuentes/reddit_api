@@ -53,6 +53,15 @@ describe RedditApi::Users, :vcr do
 
       expect(users_api.misses).to eq(0)
     end
+
+    it "returns an empty array if the subreddit does not exist" do
+      users_api = RedditApi::Users.new
+      subreddit = RedditApi::Subreddit.new({ "display_name" => "9" })
+
+      posters = users_api.top_posters(subreddit, 99)
+
+      expect(posters).to eq([])
+    end
   end
 
 end
