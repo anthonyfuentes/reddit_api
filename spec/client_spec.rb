@@ -55,7 +55,7 @@ describe RedditApi::Client, :vcr do
       query = RedditApi::Query.new(count: 125)
 
       client.get(query)
-      unique_resources = query.collected_records.uniq do |r|
+      unique_resources = query.captured_records.uniq do |r|
         r["data"]["id"]
       end
 

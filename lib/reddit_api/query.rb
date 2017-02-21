@@ -20,7 +20,7 @@ module RedditApi
       end
     end
 
-    def collected_records
+    def captured_records
       records.keys
     end
 

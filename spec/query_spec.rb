@@ -11,14 +11,14 @@ describe RedditApi::Query do
     end
   end
 
-  describe "#collected_records" do
+  describe "#captured_records" do
     it "returns the records captured for the query" do
       records = Array.new(3) { |i| RecordStub.new(id: i) }
       query = RedditApi::Query.new(count: 3)
 
       query.add_records(records)
 
-      expect(query.collected_records).to eq(records)
+      expect(query.captured_records).to eq(records)
     end
   end
 
