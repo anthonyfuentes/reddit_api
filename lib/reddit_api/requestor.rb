@@ -2,66 +2,54 @@
 module RedditApi
   class Requestor
 
-    MAXIMUM_RECORDS = 100
-
     def initialize(args = {})
-      @client = args.fetch(:client, HTTParty)
       @agent = ENV["REDDIT_AGENT"]
+      @base_url = "https://oauth.reddit.com/"
+      @client = args.fetch(:client, HTTParty)
       @id = ENV["REDDIT_ID"]
       @password = ENV["REDDIT_PASSWORD"]
       @secret = ENV["REDDIT_SECRET"]
       @username = ENV["REDDIT_USERNAME"]
-      @base_url = "https://oauth.reddit.com/"
     end
 
-    def build(endpoint, resource_type, last_record = nil)
-      url = base_url + endpoint
+    def build(query)
+      url = base_url + query.endpoint
       headers = generate_headers
-      query = generate_query(resource_type, last_record)
-      [url, { headers: headers, query: query }]
+      api_query = generate_query(query)
+      [url, { headers: headers, query: api_query }]
     end
 
     private
-    attr_reader :agent, :base_url, :id, :password, :secret, :username, :client
+    attr_reader :agent, :base_url, :client, :id, :password, :secret, :username
 
     def generate_headers
-      access_token = generate_access_token
       {
         "Authorization" => "bearer #{access_token}",
         "user-agent" => agent
       }
     end
 
-    def generate_query(resource_type, last_record)
+    def generate_query(query)
       {
-        limit: MAXIMUM_RECORDS,
-        after: generate_after(resource_type, last_record)
+        limit: query.count,
+        after: generate_after(query.resource_type, query.offset_id)
       }
     end
 
-    def generate_after(resource_type, last_record)
-      if last_record
-        build_after(resource_type, last_record)
+    def generate_after(resource_type, offset_id)
+      if offset_id
+        build_after(resource_type, offset_id)
       else
         ""
       end
     end
 
-    def build_after(resource_type, record)
+    def build_after(resource_type, offset_id)
       prefix = TYPE_PREFIXES[resource_type]
-      last_resource_id = record_id(record)
-      "#{prefix}_#{last_resource_id}"
+      "#{prefix}_#{offset_id}"
     end
 
-    def record_id(record)
-      if record.is_a?(Hash)
-        record["data"]["id"]
-      else
-        record
-      end
-    end
-
-    def generate_access_token
+    def access_token
       url = "https://www.reddit.com/api/v1/access_token"
       basic_auth = { username: id,
                      password: secret }
