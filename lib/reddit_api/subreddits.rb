@@ -5,6 +5,7 @@ module RedditApi
     def initialize
       @client = RedditApi::Client.new
       @subreddit_factory = RedditApi::Subreddit
+      @query_factory =  RedditApi::Query
     end
 
     def top(count)
@@ -13,27 +14,42 @@ module RedditApi
     end
 
     def data_for(subreddit)
-      endpoint = "r/#{subreddit.name}/about.json"
-      response = client.get(endpoint, 1, :subreddit)
-      build_subreddit(response)
+      query = build_singular_query(subreddit)
+      client.get(query)
+      build_subreddit(query.captured_records.first)
     end
 
     private
-    attr_reader :client, :subreddit_factory
+    attr_reader :client, :subreddit_factory, :query_factory
 
     def top_data(count)
+      query = build_plural_query(count)
+      client.get(query)
+      query.captured_records
+    end
+
+    def build_plural_query(count)
       endpoint = "subreddits/popular.json"
-      client.get(endpoint, count, :subreddit)
+      query_factory.new(count: count,
+                        endpoint: endpoint,
+                        resource: :subreddit)
+    end
+
+    def build_singular_query(subreddit)
+      endpoint = "r/#{subreddit.name}/about.json"
+      query_factory.new(count: 1,
+                        endpoint: endpoint,
+                        resource: :subreddit)
     end
 
     def build_all_subreddits(subreddits_data)
       subreddits_data.map! do |subreddit_data|
-        build_subreddit(subreddit_data)
+        build_subreddit(subreddit_data["data"])
       end
     end
 
     def build_subreddit(subreddit_data)
-      subreddit_factory.new(subreddit_data["data"])
+      subreddit_factory.new(subreddit_data)
     end
 
   end
