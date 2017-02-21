@@ -2,19 +2,19 @@ require "spec_helper"
 
 describe RedditApi::Comments, :vcr do
 
-  context "when count within single api request limit of 100" do
-    describe "#most_recent_subreddits" do
-      it "returns the names of n subreddits given user has commented on" do
-        comments_api = RedditApi::Comments.new
-        user = RedditApi::User.new({ "username" => "spez" })
-        count = 5
+  describe "#most_recent_subreddits" do
+    it "returns the names of n subreddits given user has commented on" do
+      comments_api = RedditApi::Comments.new
+      user = RedditApi::User.new({ "username" => "spez" })
+      count = 5
 
-        subreddits = comments_api.most_recent_subreddits(user, count)
+      subreddits = comments_api.most_recent_subreddits(user, count)
 
-        expect(subreddits.length).to eq(count)
-      end
+      expect(subreddits.length).to eq(count)
     end
+  end
 
+  context "when count within single api request limit of 100" do
     describe "#most_recent_comments" do
       it "returns n most recent comments for the given user" do
         comments_api = RedditApi::Comments.new

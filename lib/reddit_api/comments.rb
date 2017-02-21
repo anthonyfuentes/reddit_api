@@ -7,6 +7,7 @@ module RedditApi
     def initialize(args = {})
       @client = args.fetch(:client, RedditApi::Client.new)
       @comment_factory = RedditApi::Comment
+      @query_factory =  RedditApi::Query
       @offset = nil
       @failures = 0
     end
@@ -26,7 +27,7 @@ module RedditApi
       subreddits.keys
     end
 
-    def most_recent_comments(user, count = 100, offset = nil)
+    def most_recent_comments(user, count, offset = nil)
       comments_data = most_recent_comment_data(user.username, count, offset)
       build_all_comments(comments_data)
     end
@@ -35,7 +36,22 @@ module RedditApi
     attr_accessor :failures
     attr_writer :offset, :failures
     private
-    attr_reader :client, :comment_factory, :offset
+    attr_reader :client, :comment_factory, :offset, :query_factory
+
+    def most_recent_comment_data(username, count, offset)
+      return [] if username == "[deleted]"
+      query = build_query(username, count, offset)
+      client.get(query)
+      query.captured_records
+    end
+
+    def build_query(username, count, offset)
+      endpoint = "user/#{username}/comments.json"
+      query_factory.new(count: count,
+                        endpoint: endpoint,
+                        resource: :comment,
+                        offset: offset)
+    end
 
     def update_progress(comments)
       if comments.empty?
@@ -43,12 +59,6 @@ module RedditApi
       else
         self.offset = comments.last.reddit_id
       end
-    end
-
-    def most_recent_comment_data(username, count, offset)
-      return [] if username == "[deleted]"
-      endpoint = "user/#{username}/comments.json"
-      client.get(endpoint, count, :comment, offset)
     end
 
     def build_all_comments(comments_data)

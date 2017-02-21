@@ -5,7 +5,7 @@ describe RedditApi::Requestor, :vcr do
   describe "build" do
     it "returns an array representing an api request" do
       requestor = RedditApi::Requestor.new
-      query = RedditApi::Query.new()
+      query = RedditApi::Query.new(count: 1)
 
       request = requestor.build(query)
 

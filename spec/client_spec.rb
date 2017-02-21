@@ -83,7 +83,7 @@ describe RedditApi::Client, :vcr do
       it "returns n resources from a given endpoint" do
         client = RedditApi::Client.new
         query = RedditApi::Query.new(count: 125,
-                                     resource_type: :subreddit,
+                                     resource: :subreddit,
                                      endpoint: "subreddits/popular.json")
 
         client.get(query)
