@@ -2,23 +2,24 @@
 module RedditApi
   class Comments
 
-    MAX_FAILURES = 5
+    DEFAULT_MAX_MISSES = 2
 
     def initialize(args = {})
       @client = args.fetch(:client, RedditApi::Client.new)
       @comment_factory = RedditApi::Comment
       @query_factory =  RedditApi::Query
       @offset = nil
-      @failures = 0
+      @misses = 0
+      @max_misses = args.fetch(:max_miss, DEFAULT_MAX_MISSES)
     end
 
     def most_recent_subreddits(user, count)
-      self.failures = 0
+      self.misses = 0
       subreddits = {}
       loops = 0
       while subreddits.length < count &&
-          failures < MAX_FAILURES &&
-          loops < MAX_FAILURES
+          misses < max_misses &&
+          loops < max_misses
         comments = most_recent_comments(user, 100, offset)
         update_progress(comments)
         collect_subreddits(comments, count, subreddits)
@@ -33,10 +34,11 @@ module RedditApi
     end
 
     protected
-    attr_accessor :failures
-    attr_writer :offset, :failures
+    attr_accessor :misses
+    attr_writer :offset
     private
-    attr_reader :client, :comment_factory, :offset, :query_factory
+    attr_reader :client, :comment_factory, :offset, :query_factory,
+                :max_misses
 
     def most_recent_comment_data(username, count, offset)
       return [] if username == "[deleted]"
@@ -55,7 +57,7 @@ module RedditApi
 
     def update_progress(comments)
       if comments.empty?
-        self.failures += 1
+        self.misses += 1
       else
         self.offset = comments.last.reddit_id
       end
@@ -80,3 +82,4 @@ module RedditApi
 
   end
 end
+
