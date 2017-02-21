@@ -12,9 +12,9 @@ module RedditApi
     end
 
     SLEEP_TIME = self.sleep_time
-    MAX_FAILURES = 5
+    DEFAULT_MAX_FAILURES = 2
 
-    attr_reader :failures
+    attr_reader :failures, :max_failures
 
     def initialize(args = {})
       @client = args.fetch(:client, HTTParty)
@@ -22,10 +22,11 @@ module RedditApi
       @parser = args.fetch(:parser, RedditApi::ResponseParser)
       @null_response_factory = RedditApi:: NullResponse
       @failures = args.fetch(:failures, 0)
+      @max_failures = args.fetch(:max_fail, DEFAULT_MAX_FAILURES)
     end
 
     def get(query)
-      while query.capture_count < query.count && failures < MAX_FAILURES
+      while query.capture_count < query.count && failures < max_failures
         response = send_request(query)
         response = parser.parse_response(response, query.count)
         update_progress(query, response)
