@@ -5,7 +5,7 @@ module RedditApi
     attr_reader :count, :endpoint, :offset_id, :resource_type
 
     def initialize(args = {})
-      @count = args.fetch(:count, 100)
+      @count = args.fetch(:count)
       @endpoint = args.fetch(:endpoint, "")
       @offset_id = args.fetch(:offset, "")
       @records = args.fetch(:records, {})
@@ -35,9 +35,9 @@ module RedditApi
 
     def add_multiple_records(new_records)
       new_records.each do |record|
-        records[record] = true
+        add_single_record(record)
+        break if records.length == count
       end
-      update_offset_id(new_records.last)
     end
 
     def add_single_record(record)
