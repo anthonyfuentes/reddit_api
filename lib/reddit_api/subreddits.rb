@@ -13,8 +13,8 @@ module RedditApi
       build_all_subreddits(subreddits_data)
     end
 
-    def data_for(subreddit)
-      query = build_singular_query(subreddit)
+    def data_for(subreddit_name)
+      query = build_singular_query(subreddit_name)
       client.get(query)
       build_subreddit(query.captured_records.first)
     end
@@ -35,8 +35,8 @@ module RedditApi
                         resource: :subreddit)
     end
 
-    def build_singular_query(subreddit)
-      endpoint = "r/#{subreddit.name}/about.json"
+    def build_singular_query(subreddit_name)
+      endpoint = "r/#{subreddit_name}/about.json"
       query_factory.new(count: 1,
                         endpoint: endpoint,
                         resource: :subreddit)

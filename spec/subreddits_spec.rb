@@ -37,11 +37,9 @@ describe RedditApi::Subreddits, :vcr do
 
     describe "#data_for" do
       it "returns Subreddit object representing the given subreddit" do
-        subreddit = double()
-        allow(subreddit).to receive(:name).and_return("AskReddit")
         subreddit_api = RedditApi::Subreddits.new
 
-        subreddit = subreddit_api.data_for(subreddit)
+        subreddit = subreddit_api.data_for("AskReddit")
 
         expect(subreddit).to be_a(RedditApi::Subreddit)
       end
