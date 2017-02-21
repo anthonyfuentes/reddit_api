@@ -2,31 +2,33 @@
 module RedditApi
   class Users
 
+    DEFAULT_MAX_MISSES = 2
+
     attr_reader :misses
 
     def initialize(args = {})
       @post_api = RedditApi::Posts.new
       @user_factory = RedditApi::User
       @misses = args.fetch(:misses, 0)
+      @max_misses = args.fetch(:max_miss, DEFAULT_MAX_MISSES)
       @last_count = 0
     end
 
-    MAX_MISSES = 5
-
     def top_posters(subreddit, count)
       users = {}
-      while users.length < count && misses < MAX_MISSES
+      while users.length < count && misses < max_misses
         posts = post_api.top(subreddit, count)
         collect_users(posts, count, users)
         update_misses(users.length)
       end
+      reset_misses
       users.values
     end
 
     protected
     attr_writer :misses, :last_count
     private
-    attr_reader :post_api, :user_factory, :last_count
+    attr_reader :post_api, :user_factory, :last_count, :max_misses
 
     def collect_users(posts, count, users)
       usernames = get_usernames(posts, count, users)
@@ -66,11 +68,14 @@ module RedditApi
       end
     end
 
-    def update_misses(length)
-      if (length - last_count).zero?
+    def update_misses(new_count)
+      if (new_count - last_count).zero?
         self.misses += 1
-        self.last_count = length
       end
+    end
+
+    def reset_misses
+      self.misses = 0
     end
 
   end

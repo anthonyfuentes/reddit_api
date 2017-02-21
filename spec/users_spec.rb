@@ -35,13 +35,23 @@ describe RedditApi::Users, :vcr do
     end
 
     it "returns if misses is equal to max misses" do
-      misses = RedditApi::Users::MAX_MISSES
+      misses = RedditApi::Users::DEFAULT_MAX_MISSES
       users_api = RedditApi::Users.new(misses: misses)
       subreddit = RedditApi::Subreddit.new({ "display_name" => "AskReddit" })
 
       result = users_api.top_posters(subreddit, 10)
 
       expect(result.length).to eq(0)
+    end
+
+    it "resets misses to 0 after collecting users" do
+      max_misses = RedditApi::Users::DEFAULT_MAX_MISSES
+      users_api = RedditApi::Users.new(misses: max_misses)
+      subreddit = RedditApi::Subreddit.new({ "display_name" => "AskReddit" })
+
+      users_api.top_posters(subreddit, 99)
+
+      expect(users_api.misses).to eq(0)
     end
   end
 
