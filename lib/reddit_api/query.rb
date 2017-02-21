@@ -35,23 +35,21 @@ module RedditApi
 
     def add_multiple_records(new_records)
       new_records.each do |record|
-        add_single_record(record)
+        record_id = record["data"]["id"]
+        records[record_id] = record
+        update_offset_id(record_id)
         break if records.length == count
       end
     end
 
     def add_single_record(record)
-      record_id = record_id(record)
+      record_id = record["id"]
       records[record_id] = record
-      update_offset_id(record)
+      update_offset_id(record_id)
     end
 
-    def update_offset_id(record)
-      self.offset_id = record_id(record)
-    end
-
-    def record_id(record)
-      record["data"]["id"]
+    def update_offset_id(record_id)
+      self.offset_id = record_id
     end
 
   end
