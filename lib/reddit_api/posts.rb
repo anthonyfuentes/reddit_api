@@ -36,7 +36,13 @@ module RedditApi
 
     def stickied_posts(posts_data)
       posts_data.select do |post_data|
-        !post_data["data"]["stickied"]
+        !stickied?(post_data)
+      end
+    end
+
+    def stickied?(post_data)
+      if post_data && post_data["data"]
+        post_data["data"]["stickied"]
       end
     end
 
