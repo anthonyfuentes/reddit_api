@@ -25,7 +25,7 @@ module RedditApi
     end
 
     def get(query)
-      while query.records_captured < query.count && failures < MAX_FAILURES
+      while query.capture_count < query.count && failures < MAX_FAILURES
         response = send_request(query)
         response = parser.parse_response(response, query.count)
         update_progress(query, response)
@@ -45,9 +45,9 @@ module RedditApi
     end
 
     def update_progress(query, response)
-      captured_before = query.records_captured
+      captured_before = query.capture_count
       update_query(query, response)
-      captured_after = query.records_captured
+      captured_after = query.capture_count
       update_failures(captured_before, captured_after, query.count)
     end
 
