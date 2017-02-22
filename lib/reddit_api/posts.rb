@@ -10,6 +10,7 @@ module RedditApi
 
     def top(subreddit, count)
       posts_data = top_data(subreddit, count)
+      posts_data = map_to_params(posts_data)
       posts_data = filter_out(posts_data, :stickied_posts)
       build_all_posts(posts_data)
     end
@@ -34,15 +35,19 @@ module RedditApi
       send(filter, posts_data)
     end
 
-    def stickied_posts(posts_data)
-      posts_data.select do |post_data|
-        !stickied?(post_data)
+    def map_to_params(posts_data)
+      post_params = []
+      posts_data.each do |post_data|
+        if params = post_data["data"]
+          post_params.push(params)
+        end
       end
+      post_params
     end
 
-    def stickied?(post_data)
-      if post_data && post_data["data"]
-        post_data["data"]["stickied"]
+    def stickied_posts(posts_data)
+      posts_data.select do |post_data|
+        !post_data["stickied"]
       end
     end
 
@@ -53,10 +58,9 @@ module RedditApi
     end
 
     def build_post(post_data)
-      if post_data["data"]
-        post_factory.new(post_data["data"])
-      end
+      post_factory.new(post_data)
     end
 
   end
 end
+
