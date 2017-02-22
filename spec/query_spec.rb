@@ -139,6 +139,16 @@ describe RedditApi::Query do
 
         expect(query.offset_id).to eq(records.length - 1)
       end
+
+      it "can handle arrays w/ nil values" do
+        query = RedditApi::Query.new(count: 3)
+        records = Array.new(2) { |i| RecordStub.new(id: i) }
+        records += [nil]
+
+        query.add_records(records)
+
+        expect(query.capture_count).to eq(records.length - 1)
+      end
     end
   end
 

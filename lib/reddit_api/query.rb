@@ -14,7 +14,7 @@ module RedditApi
 
     def add_records(new_records)
       if count > 1
-        add_multiple_records(new_records)
+        add_multiple_records(new_records.compact)
       else
         add_single_record(new_records)
       end
@@ -35,11 +35,15 @@ module RedditApi
 
     def add_multiple_records(new_records)
       new_records.each do |record|
-        record_id = record["data"]["id"]
-        records[record_id] = record
-        update_offset_id(record_id)
+        add_data_record(record)
         break if records.length == count
       end
+    end
+
+    def add_data_record(record)
+      record_id = record["data"]["id"]
+      records[record_id] = record
+      update_offset_id(record_id)
     end
 
     def add_single_record(record)
