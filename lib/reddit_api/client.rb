@@ -18,9 +18,6 @@ module RedditApi
     attr_accessor :sleep_time
 
     def initialize(args = {})
-      puts '*' * 50
-      puts 'initialize'
-      puts '*' * 50
       @client = args.fetch(:client, HTTParty)
       @requestor = args.fetch(:requestor, RedditApi::Requestor.new(client: client))
       @parser = args.fetch(:parser, RedditApi::ResponseParser)
@@ -32,14 +29,7 @@ module RedditApi
 
     def get(query)
       while query.capture_count < query.count && failures < max_failures
-        puts '*' * 50
-        puts 'sending request'
-        puts '*' * 50
         response = send_request(query)
-        puts '*' * 50
-        puts 'response'
-        puts response
-        puts '*' * 50
         response = parser.parse_response(response, query.count)
         update_progress(query, response)
       end
