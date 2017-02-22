@@ -19,9 +19,6 @@ module RedditApi
     def most_recent_subreddits(user, count)
       subreddits = {}
       while subreddits.length < count && misses < max_misses
-puts "-" * 50
-puts offset
-puts "-" * 50
         comments = most_recent_comments(user, 100, offset)
         collect_subreddits(comments, count, subreddits)
         update_progress(comments, subreddits.length)
