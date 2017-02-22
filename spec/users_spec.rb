@@ -1,4 +1,5 @@
 require "spec_helper"
+require "doubles/posts"
 
 describe RedditApi::Users, :vcr do
 
@@ -62,6 +63,17 @@ describe RedditApi::Users, :vcr do
 
       expect(posters).to eq([])
     end
-  end
 
+    it "increments misses if no users are added" do
+      posts_api = PostsStub.new
+      response =  PostsStub::DEFAULT_RESPONSE
+      users_api = RedditApi::Users.new(posts: posts_api)
+      subreddit = RedditApi::Subreddit.new({ "display_name" => "9" })
+
+      expect(posts_api).to receive(:top).and_return(response, response, response)
+      posters = users_api.top_posters(subreddit, 5)
+
+      expect(posters.length).to eq(1)
+    end
+  end
 end

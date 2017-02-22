@@ -1,4 +1,3 @@
-
 module RedditApi
   class Query
 

@@ -1,4 +1,3 @@
-
 module RedditApi
   class Users
 
@@ -7,7 +6,7 @@ module RedditApi
     attr_reader :misses
 
     def initialize(args = {})
-      @post_api = RedditApi::Posts.new
+      @post_api = args.fetch(:posts, RedditApi::Posts.new)
       @user_factory = RedditApi::User
       @misses = args.fetch(:misses, 0)
       @max_misses = args.fetch(:max_miss, DEFAULT_MAX_MISSES)
@@ -21,7 +20,7 @@ module RedditApi
         collect_users(posts, count, users)
         update_misses(users.length)
       end
-      reset_misses
+      reset_collection_metrics
       users.values
     end
 
@@ -63,6 +62,7 @@ module RedditApi
     end
 
     def aggregate_users(new_users, collected_users)
+      self.last_count = collected_users.length
       new_users.each do |user|
         collected_users[user.username] = user
       end
@@ -74,8 +74,9 @@ module RedditApi
       end
     end
 
-    def reset_misses
+    def reset_collection_metrics
       self.misses = 0
+      self.last_count = 0
     end
 
   end
