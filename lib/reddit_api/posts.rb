@@ -53,7 +53,9 @@ module RedditApi
     end
 
     def build_post(post_data)
-      post_factory.new(post_data["data"])
+      if post_data["data"]
+        post_factory.new(post_data["data"])
+      end
     end
 
   end
